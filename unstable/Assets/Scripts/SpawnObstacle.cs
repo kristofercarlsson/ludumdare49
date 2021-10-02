@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
  
 public class SpawnObstacle : MonoBehaviour {
+    public Transform startMarker;
+    public Transform endMarker;
     public GameObject obstacle;
- 
-    public int obstacleCount = 0;
-    public int obstacleLimit = 5;
-    public int obstaclesPerFrame = 1;
-    public float obstacleSpeed = 0.2f;
- 
-    void Update() {
-        if (obstacleCount < obstacleLimit) {
-            AddObstacle();
-        }
+    private float speed = 10.0F;
+    private float startTime;
+    private float journeyLength;
+    private GameObject newObstacle;
+
+    void Start() {
+        startTime = Time.time;
+        journeyLength = Vector3.Distance(startMarker.position, endMarker.position);
+        newObstacle = Instantiate(obstacle, startMarker.position, Quaternion.identity);
     }
- 
-    void AddObstacle() {
-        obstacleCount += 1;
-        GameObject newObstacle = Instantiate(obstacle, new Vector2(5, 0), Quaternion.identity);
-        newObstacle.transform.position = new Vector2(obstacleSpeed * Time.deltaTime, 0);
+
+    void Update() {
+        if (newObstacle == null && !ReferenceEquals(newObstacle, null)) {
+            newObstacle = Instantiate(obstacle, startMarker.position, Quaternion.identity);
+        }
+        if (newObstacle.transform.position.x == endMarker.position.x) {
+            Destroy(newObstacle);
+        }
+        if (newObstacle.activeSelf) {
+            float distCovered = (Time.time - startTime) * speed;
+            float fractionOfJourney = distCovered / journeyLength;
+            newObstacle.transform.position = Vector3.Lerp(startMarker.position, endMarker.position, fractionOfJourney);
+        }
     }
 }
