@@ -12,6 +12,6 @@ public class MoveObstacle : MonoBehaviour
 
     private void FixedUpdate()
     {
-        body.velocity = new Vector2(startVelocity, body.velocity.y);
+        body.velocity = new Vector2( startVelocity, body.velocity.y);
     }
 }
