@@ -1,63 +1,48 @@
+using System;
+using Unity.Mathematics;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BatMovement : MonoBehaviour
 {
-    public Rigidbody2D playerBody;
-    public Rigidbody2D body;
+    public Rigidbody2D targetBody;
+    public float moveForce = 500;
+    public float viewDistance = 10f;
 
-    public int unitsToMove = 5;
-    public float enemySpeed = 500;
+    private Rigidbody2D body;
+    private Vector2 position;
+    private Vector2 targetPosition;
 
-    private bool isFacingRight;
-    private bool moveRight = true;
+    private int directionX = 1;
 
-    private float playerStartPos;
-    private float playerEndPos;
-
-    public void Awake()
+    private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        playerStartPos = transform.position.x;
-        playerEndPos = playerStartPos;
-        isFacingRight = transform.localScale.x > 0;
     }
 
-    public void Update()
+    private void Update()
     {
-        // target player
-        playerStartPos = playerBody.transform.position.x;
-        playerEndPos = playerBody.transform.position.x + unitsToMove;
+        position.x = transform.position.x;
+        position.y = transform.position.y;
 
-        if (moveRight)
+        targetPosition.x = targetBody.transform.position.x;
+        targetPosition.y = targetBody.transform.position.y;
+
+        if (Vector2.Distance(position, targetPosition) < viewDistance)
         {
-            body.AddForce(Vector2.right * enemySpeed * Time.deltaTime);
-            if (!isFacingRight)
+            var newDirectionX = position.x < targetPosition.x ? 1 : -1;
+            if (newDirectionX != directionX)
             {
-                Flip();
+                transform.transform.Rotate(0f, 180f, 0f);
             }
-        }
+            directionX = newDirectionX;
+            
+            var force = (targetPosition - position).normalized;
+            
+            force.x = (force.x * moveForce * Time.deltaTime);
+            force.y = (force.y * moveForce * Time.deltaTime);
 
-        if (body.position.x >= playerEndPos)
-        {
-            moveRight = false;
+            body.AddForce(force);
         }
-
-        if (!moveRight)
-        {
-            body.AddForce(-Vector2.right * enemySpeed * Time.deltaTime);
-            if (isFacingRight)
-                Flip();
-        }
-
-        if (body.position.x <= playerStartPos)
-        {
-            moveRight = true;
-        }
-    }
-
-    public void Flip()
-    {
-        transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-        isFacingRight = transform.localScale.x > 0;
     }
 }

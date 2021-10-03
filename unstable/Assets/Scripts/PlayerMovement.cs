@@ -53,9 +53,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if(other.transform.tag == "Dog")
+        if(other.transform.tag == "Dog" || other.transform.tag == "Bat")
         {
-            Debug.Log("Wooof");
             SceneManager.LoadScene (sceneName:"GameOver");
         }
         if (other.transform.tag == "Platform")
