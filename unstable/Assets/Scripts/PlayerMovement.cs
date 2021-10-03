@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -52,6 +53,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        if(other.transform.tag == "Dog")
+        {
+            Debug.Log("Wooof");
+            SceneManager.LoadScene (sceneName:"GameOver");
+        }
         if (other.transform.tag == "Platform")
         {
             platformCollisionCount++;
