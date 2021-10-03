@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,29 +6,26 @@ using UnityEngine;
 public class SpawnObstacle : MonoBehaviour {
     public Transform startMarker;
     public Transform endMarker;
-    public GameObject obstacle;
-    private float speed = 10.0F;
-    private float startTime;
-    private float journeyLength;
-    private GameObject newObstacle;
-
-    void Start() {
-        startTime = Time.time;
-        journeyLength = Vector3.Distance(startMarker.position, endMarker.position);
-        newObstacle = Instantiate(obstacle, startMarker.position, Quaternion.identity);
-    }
-
+    public GameObject template;
+    
+    private GameObject obstacle;
+    
     void Update() {
-        if (newObstacle == null && !ReferenceEquals(newObstacle, null)) {
-            newObstacle = Instantiate(obstacle, startMarker.position, Quaternion.identity);
+        if (obstacle == null) {
+            Debug.Log("Create obstacle");
+            obstacle = Instantiate(template, startMarker.position, Quaternion.identity);
+            obstacle.AddComponent<MoveObstacle>();
+            var script = obstacle.GetComponent<MoveObstacle>();
+            script.startVelocity = -5;
+            return;
         }
-        if (newObstacle.transform.position.x == endMarker.position.x) {
-            Destroy(newObstacle);
-        }
-        if (newObstacle.activeSelf) {
-            float distCovered = (Time.time - startTime) * speed;
-            float fractionOfJourney = distCovered / journeyLength;
-            newObstacle.transform.position = Vector3.Lerp(startMarker.position, endMarker.position, fractionOfJourney);
+
+        var diff = Math.Abs(obstacle.transform.position.x - endMarker.position.x);
+        if (diff < 0.5f) {
+            Debug.Log("Destroy obstacle");
+            Destroy(obstacle);
+            obstacle = null;
+            return;
         }
     }
 }
